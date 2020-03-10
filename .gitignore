@@ -1,0 +1,10 @@
+android/
+ios/
+node_modules/
+.prettierrc.js
+.watchmanconfig
+.flowconfig
+.eslintrc.js
+.DS_Store/
+.buckconfig
+.DS_Store/
