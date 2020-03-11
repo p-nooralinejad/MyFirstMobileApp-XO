@@ -123,7 +123,21 @@ const styles = StyleSheet.create({
 });
 
 export default class App extends Component {
-  state = {game: 'on', turn: 'X', table: [ [' ',' ',' '] , [' ',' ',' '] , [' ',' ',' '] ], msg: ''};
+  
+  constructor(props){
+    super(props);
+    this.state = {
+            game: 'on', 
+            turn: 'X', 
+            table: [ 
+              [' ',' ',' '],
+              [' ',' ',' '],
+              [' ',' ',' '] 
+            ],
+            msg: '',
+            totalMoves: 0};
+  }
+
   changeTurn(){
     if(this.state.turn == 'X'){
       this.setState({turn :'O'});
@@ -132,13 +146,84 @@ export default class App extends Component {
       this.setState({turn :'X'});
     }
   }
+
+  checkWin(team){
+
+    var checkDiag1 = true, checkDiag2 = true;
+    for(var i=0;i < 3;i++){
+      if( this.state.table[i][i] != team ){
+        checkDiag1 = false;
+      }
+      if( this.state.table[i][2-i] != team){
+        checkDiag2 = false;
+      }
+    }
+
+    if(checkDiag1 || checkDiag2)
+      return true;
+  
+    var rowCheck = false;
+    for(var i=0;i < 3;i++){
+      rowCheck = true;
+      for(var j=0;j < 3;j++){
+        if(this.state.table[i][j] != team)
+          rowCheck = false;
+      }
+
+      if(rowCheck)
+        return true;
+    }
+
+    var colCheck = false;
+    for(var i=0;i < 3;i++){
+      colCheck = true;
+      for(var j=0;j < 3;j++){
+        if(this.state.table[j][i] != team)
+          colCheck = false;
+      }
+
+      if(colCheck)
+        return true;
+    }
+
+  }
+
+  checkState(){
+    if(this.checkWin('X')){
+      this.setState({
+        msg: 'X is the Winner!',
+        msgclr: 'green',
+        game: 'X'
+      })
+    }
+
+    else if(this.checkWin('O')){
+      this.setState({
+        msg: 'O is the Winner!',
+        msgclr: 'green',
+        game: 'O'
+      })
+    }
+
+    else if(this.state.totalMoves == 9){
+      this.setState({
+          msg: 'Tied game',
+          msgclr: 'yellow'
+      })
+    }
+  }
+
   touched(y, x){
+  
     if(this.state.game != 'on')
       return;
+  
     if(this.state.table[y][x] == ' '){
+      this.state.totalMoves += 1;
       this.state.table[y][x] = this.state.turn;
       this.changeTurn();
       this.setState({msg: ''});
+      this.checkState();
     }
 
     else{
@@ -223,6 +308,19 @@ export default class App extends Component {
         
         <View style={styles.ExtraMsg}>
           <Text style={{color: this.state.msgclr, fontSize:20}}>{this.state.msg}</Text>
+          <Text style={{color: 'cyan'}}
+            onPress={() => this.setState({
+            game: 'on', 
+            turn: 'X', 
+            table: [ 
+              [' ',' ',' '],
+              [' ',' ',' '],
+              [' ',' ',' '] 
+            ],
+            msg: '',
+            totalMoves: 0}) }>
+          Rematch?
+        </Text>
         </View>
 
       </View>
